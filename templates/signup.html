@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .signup-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px; /* Added max-width for better responsiveness */
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #loginBtn {
+            background-color: #008CBA; /* Change color for signup button */
+        }
+
+        .password-toggle {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 5px;
+            color: #008CBA; /* Change color for password toggle */
+        }
+    </style>
+</head>
+<body>
+{% if user_authenticated %}
+        <script>
+        function navigateToLanding() {
+            window.location.href = "{% url 'landing' %}";
+        }
+        </script>
+    <body onload="navigateToLanding()"></body>
+{% else %}
+    <div class="signup-container">
+        <h2>Signup</h2>
+        <form id="signupForm" action="{% url 'signup' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Signup</button>
+            <!-- Add back to login button -->
+            <button id="loginBtn" type="button" onclick="navigateToLogin()">Login</button>
+        </form>
+    </div>
+    <script>
+        function navigateToLogin() {
+            // Get the current pathname
+            // Navigate to the login URL
+            window.location.href = "{% url 'login' %}";
+        }
+    </script>
+{% endif %}
+</body>
+</html>
+

@@ -1,0 +1,91 @@
+<!-- kinky/templates/homepage.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px; /* Add margin for spacing */
+        }
+
+        #signupBtn {
+            background-color: #008CBA; /* Change color for signup button */
+        }
+
+    </style>
+</head>
+<body>
+{% if user_authenticated %}
+        <script>
+        function navigateToLanding() {
+            window.location.href = "{% url 'landing' %}";
+        }
+        </script>
+    <body onload="navigateToLanding()"></body>
+{% else %}
+    <div class="login-container">
+        <h2>Login</h2>
+        <form method="post" action="{% url 'login' %}" id="loginForm">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Login</button>
+
+            <!-- Add Signup button -->
+            <button id="signupBtn" type="button" onclick="navigateToSignUp()">Signup</button>
+        </form>
+    </div>
+    <script>
+        function navigateToSignUp() {
+            // Get the current pathname
+            // Navigate to the login URL
+            window.location.href = "{% url 'signup' %}";
+        }
+        function navigateToLanding() {
+            window.location.href = "{% url 'landing' %}";
+        }
+    </script>
+{% endif %}
+</body>
+</html>
