@@ -4,7 +4,8 @@ from .views import landing
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.views import LogoutView
 from .views import profile
-
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.views.generic.base import RedirectView
 
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('landing', landing, name='landing'),
     path('logout', LogoutView.as_view(), name='logout'),
     path('profile', profile, name='profile'),
+    path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
 ]
