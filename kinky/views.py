@@ -1,6 +1,4 @@
-from django.shortcuts import render, redirect
 from django.views import View
-
 from .forms import SignupForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -59,6 +57,7 @@ def permission_denied_view(request):
 class UserProfileView(View):
     template_name = 'profile.html'
 
+
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
         if request.user.is_authenticated and request.user.username == username:
@@ -80,8 +79,7 @@ def all_users(request):
     return render(request, 'allUsers.html', {'users': users})
 
 
-def follow_user(request, user_id):
-    user_to_follow = get_object_or_404(User, id=user_id)
-    request.user.profile.following.add(user_to_follow)
-    return redirect('profile_detail', user_id=user_id)
-
+def user_profile_view(request, username):
+    viewed_user = get_object_or_404(User, username=username)
+    user_profile = UserProfileView.objects.get(user=viewed_user)
+    return render(request, 'profile.html', {'viewed_user': viewed_user, 'user_profile': user_profile})
