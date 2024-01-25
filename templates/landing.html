@@ -98,7 +98,7 @@
 <body>
     <header>
         <div class="dropdown">
-            <a href="{% url 'profile' %}" class="dropdown-item">My Profile</a>
+            <a href="/profile/{{ request.user.username }}">{{ request.user.username }}'s Profile</a>
         </div>
         <h1>Cute Landing Page</h1>
     </header>

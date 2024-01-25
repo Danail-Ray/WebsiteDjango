@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
+from django.views import View
+
 from .forms import SignupForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect
 
 
 def login_view(request):
@@ -53,6 +56,26 @@ def permission_denied_view(request):
     raise PermissionDenied
 
 
-def profile(request):
-    return render(request, 'profile.html')
+class Profile(View):
+    template_name = 'profile.html'
+
+    def get(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise Http404("User does not exist")
+
+        return render(request, self.template_name, {'user': user})
+
+
+def all_users(request):
+    users = User.objects.all()
+    return render(request, 'allUsers.html', {'users': users})
+
+
+def follow_user(request, user_id):
+    user_to_follow = get_object_or_404(User, id=user_id)
+    request.user.profile.following.add(user_to_follow)
+    return redirect('profile_detail', user_id=user_id)
 

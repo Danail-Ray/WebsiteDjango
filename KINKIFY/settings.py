@@ -84,7 +84,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
         'USERNAME': BASE_DIR / 'db.sqlite3',
         'EMAIL': BASE_DIR / 'db.sqlite3',
-        'PASSWORD': BASE_DIR / 'db.sqlite3'
+        'PASSWORD': BASE_DIR / 'db.sqlite3',
+        'FOLLOWERS': BASE_DIR / 'db.sqlite3',
+        'FOLLOWING': BASE_DIR / 'db.sqlite3',
     }
 }
 
