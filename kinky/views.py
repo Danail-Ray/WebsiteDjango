@@ -56,17 +56,23 @@ def permission_denied_view(request):
     raise PermissionDenied
 
 
-class Profile(View):
+class UserProfileView(View):
     template_name = 'profile.html'
 
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
+        if request.user.is_authenticated and request.user.username == username:
+            user = request.user
+        else:
+            # If viewing someone else's profile, retrieve the user by username
+            user = get_object_or_404(User, username=username)
+
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise Http404("User does not exist")
 
-        return render(request, self.template_name, {'user': user})
+        return render(request, self.template_name, {'viewed_user': user})
 
 
 def all_users(request):
