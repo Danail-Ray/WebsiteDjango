@@ -1,10 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from .models import UserProfile
 
 
 class SignupForm(forms.Form):
     username = forms.CharField(max_length=100)
+    name = forms.CharField(max_length=100)
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
@@ -22,6 +23,16 @@ class SignupForm(forms.Form):
         user = User.objects.create_user(
             username=self.cleaned_data['username'],
             email=self.cleaned_data['email'],
-            password=self.cleaned_data['password']
+            first_name=self.cleaned_data['name']
         )
+        user.set_password(self.cleaned_data['password'])
+        user.save()
+
+        # Create UserProfile and associate it with the user
+        UserProfile.objects.create(
+            user=user,
+            followers_count=0,
+            bio=""
+        )
+
         return user

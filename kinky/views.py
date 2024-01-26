@@ -57,7 +57,6 @@ def permission_denied_view(request):
 class UserProfileView(View):
     template_name = 'profile.html'
 
-
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
         if request.user.is_authenticated and request.user.username == username:
@@ -83,3 +82,24 @@ def user_profile_view(request, username):
     viewed_user = get_object_or_404(User, username=username)
     user_profile = UserProfileView.objects.get(user=viewed_user)
     return render(request, 'profile.html', {'viewed_user': viewed_user, 'user_profile': user_profile})
+
+
+def update_bio_view(request):
+    try:
+        if request.method == 'POST':
+            user = request.user
+            text_value = request.POST.get('bioValue')
+            user.user.bio = text_value
+            user.user.save()
+
+        # Add any additional context data you need for the 'profile.html' template
+        context = {
+            'user': request.user,
+            # Add other context data as needed
+        }
+
+        return render(request, 'profile.html', context)
+    except Exception as e:
+        # Handle exceptions if needed
+        print(f"An error occurred: {e}")
+        return redirect('/landing')  # Provide a default URL in case of an error

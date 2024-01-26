@@ -36,7 +36,7 @@
         }
 
         .header__wrapper header {
-            width: 101.5%;
+            width: 100%;
             background: url("../static/images/waves.jpg") no-repeat 50% 20% / cover;
             min-height: calc(100px + 15vw);
             overflow: hidden;
@@ -233,19 +233,6 @@
                 margin-top: 0;
             }
 
-            #container1 {
-                height: 100%;
-                width: 100%;
-                overflow: hidden;
-            }
-
-            #container2 {
-                width: 100%;
-                height: 100%;
-                overflow: auto;
-                padding-right: 20px;
-            }
-
             html, body {
                 height: 100%;
                 overflow: hidden;
@@ -270,60 +257,107 @@
 
                     <ul class="about">
                         <li><span>4,073</span>Followers</li>
+
                         <li><span>322</span>Following</li>
+
                         <li><span>200,543</span>Attraction</li>
                     </ul>
 
                     <div class="content">
-                        {% if user_profile_view.bio %}
-                            <div class="content">
-                                <p>{{ user_profile.bio }}</p>
-                            </div>
-                        {% else %}
-                            <div class="content">
-                                <p>No bio available</p>
-                            </div>
-                        {% endif %}
+                        <div class="content">
+                            <p>{{ viewed_user.user.bio }}</p>
+                        </div>
+
                         {% if viewed_user == request.user %}
                             <div class="content">
-                                <button id="changeBioButton">Add Bio</button>
+                                <button onclick="openPopup()">Add Bio</button>
+                                <div id="overlay">
+                                    <div id="popup">
+                                        <label for="textInput">Enter text:</label>
+                                        {% csrf_token %}
+                                        <textarea id="bioValue" rows="4"
+                                                  cols="50"> {{ request.user.user.bio }}</textarea>
+                                        <br>
+                                        <button onclick="saveText()">Save</button>
+                                        <button onclick="discardText()">Discard</button>
+                                    </div>
+                                </div>
                             </div>
+
+                            <script>
+                                function openPopup() {
+                                    document.getElementById('overlay').style.display = 'block';
+                                }
+
+                                function closePopup() {
+                                    document.getElementById('overlay').style.display = 'none';
+                                }
+
+                                function saveText() {
+                                    console.log('saveText function called');
+                                    // Get the text from the textarea
+                                    let textValue = document.getElementById('bioValue').value;
+                                    let csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+                                    let xhr = new XMLHttpRequest();
+                                    xhr.open('POST', '/changed-bio', true);
+                                    //xhr.open('POST', window.location.pathname, true); // Use the current URL
+                                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                                    xhr.setRequestHeader('X-CSRFToken', csrfToken);
+
+                                    xhr.onreadystatechange = function () {
+                                        if (xhr.readyState === 4 && xhr.status === 200) {
+                                            // Handle successful response if needed
+                                            console.log(xhr.responseText);
+                                            location.reload();
+                                        }
+                                    };
+                                    let data = 'bioValue=' + encodeURIComponent(textValue);
+                                    xhr.send(data);
+
+                                    closePopup();
+                                }
+
+                                function discardText() {
+                                    // Clear the text in the textarea
+                                    document.getElementById('bioValue').value = '';
+
+                                    // Close the popup
+                                    closePopup();
+                                }
+
+                                function reloadPage() {
+                                    location.reload();
+                                }
+                            </script>
+
+                            <style>
+                                body {
+                                    font-family: Arial, sans-serif;
+                                }
+
+                                #overlay {
+                                    display: none;
+                                    position: fixed;
+                                    top: 0;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    background-color: rgba(0, 0, 0, 0.7);
+                                }
+
+                                #popup {
+                                    position: fixed;
+                                    top: 50%;
+                                    left: 50%;
+                                    transform: translate(-50%, -50%);
+                                    background-color: white;
+                                    padding: 20px;
+                                    border-radius: 5px;
+                                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                                }
+                            </style>
                         {% endif %}
 
-                        <script>
-                            document.getElementById('changeBioButton').addEventListener('click', function () {
-                                // Toggle the visibility of the bio paragraph and the input field
-                                document.getElementById('bioParagraph').style.display = 'none';
-
-                                // Create an input field
-                                let inputField = document.createElement('input');
-                                inputField.type = 'text';
-                                inputField.id = 'bioInput';
-                                inputField.placeholder = 'Enter your bio';
-
-                                // Create a save button
-                                let saveButton = document.createElement('button');
-                                saveButton.innerHTML = 'Save Bio';
-                                saveButton.addEventListener('click', function () {
-                                    // Get the value from the input field and update the bio paragraph
-                                    document.getElementById('bioParagraph').innerHTML = inputField.value;
-
-                                    // TODO: Save the new bio in the database using AJAX or a form submission
-                                    // You can use Django forms and views for the backend part
-
-                                    // Remove the input field and save button
-                                    inputField.remove();
-                                    saveButton.remove();
-
-                                    // Show the updated bio paragraph
-                                    document.getElementById('bioParagraph').style.display = 'block';
-                                });
-
-                                // Append the input field and save button to the content div
-                                document.querySelector('.content').appendChild(inputField);
-                                document.querySelector('.content').appendChild(saveButton);
-                            });
-                        </script>
                         <ul>
                             <li><i class="fab fa-twitter"></i></li>
                             <i class="fab fa-pinterest"></i>
@@ -340,16 +374,13 @@
                             <li><a href="">groups</a></li>
                             <li><a href="">about</a></li>
                         </ul>
-                        <button>Follow</button>
+                        {% if viewed_user != request.user %}
+                            <button>Follow</button>
+                        {% endif %}
                     </nav>
-
+                    <!-- Card layout, can add 6 no problem! Make paywall after 6-->
                     <div class="photos">
-                        <img src="img/img_1.avif" alt="Photo"/>
-                        <img src="img/img_2.avif" alt="Photo"/>
-                        <img src="img/img_3.avif" alt="Photo"/>
-                        <img src="img/img_4.avif" alt="Photo"/>
-                        <img src="img/img_5.avif" alt="Photo"/>
-                        <img src="img/img_6.avif" alt="Photo"/>
+
                     </div>
                 </div>
             </div>
