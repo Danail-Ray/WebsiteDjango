@@ -7,6 +7,7 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
+from .models import UserProfile
 
 
 def login_view(request):
@@ -59,19 +60,8 @@ class UserProfileView(View):
 
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
-        if request.user.is_authenticated and request.user.username == username:
-            user = request.user
-        else:
-            # If viewing someone else's profile, retrieve the user by username
-            user = get_object_or_404(User, username=username)
-
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise Http404("User does not exist")
-
+        user = get_object_or_404(User, username=username)
         return render(request, self.template_name, {'viewed_user': user})
-
 
 def all_users(request):
     users = User.objects.all()
@@ -92,14 +82,31 @@ def update_bio_view(request):
             user.user.bio = text_value
             user.user.save()
 
-        # Add any additional context data you need for the 'profile.html' template
-        context = {
-            'user': request.user,
-            # Add other context data as needed
-        }
-
-        return render(request, 'profile.html', context)
+        # Redirect to the user's profile view after updating bio
+        return redirect('user_profile', username=user.username)
     except Exception as e:
         # Handle exceptions if needed
         print(f"An error occurred: {e}")
-        return redirect('/landing')  # Provide a default URL in case of an error
+        return redirect('landing')  # Provide a default URL in case of an error
+
+
+def upload_photo(request):
+    try:
+        if request.method == 'POST':
+            user = request.user
+            image = request.FILES.get('image')
+            user.user.image = image
+            user.user.save()
+
+        # Redirect to the user's profile view after uploading photo
+        return redirect('user_profile', username=user.username)
+    except Exception as e:
+        # Handle exceptions if needed
+        print(f"An error occurred: {e}")
+        return redirect('landing')  # Provide a default URL in case of an error
+    
+    
+def show_images(request):
+    profiles = UserProfile.objects.all()    
+    return render(request, 'profile.html', {'user_profiles': profiles})
+    

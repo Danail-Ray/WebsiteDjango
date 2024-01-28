@@ -31,8 +31,6 @@ class SignupForm(forms.Form):
         # Create UserProfile and associate it with the user
         UserProfile.objects.create(
             user=user,
-            followers_count=0,
-            bio=""
         )
 
         return user
