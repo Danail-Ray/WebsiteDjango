@@ -63,6 +63,7 @@ class UserProfileView(View):
         user = get_object_or_404(User, username=username)
         return render(request, self.template_name, {'viewed_user': user})
 
+
 def all_users(request):
     users = User.objects.all()
     return render(request, 'allUsers.html', {'users': users})
@@ -81,32 +82,28 @@ def update_bio_view(request):
             text_value = request.POST.get('bioValue')
             user.user.bio = text_value
             user.user.save()
-
-        # Redirect to the user's profile view after updating bio
-        return redirect('user_profile', username=user.username)
+            # Add any additional context data you need for the 'profile.html' template
+            context = {
+                'user': request.user,
+                # Add other context data as needed
+            }
+            return render(request, 'profile.html', context)
     except Exception as e:
         # Handle exceptions if needed
         print(f"An error occurred: {e}")
         return redirect('landing')  # Provide a default URL in case of an error
 
 
-def upload_photo(request):
+def upload_photo(request, username):
     try:
         if request.method == 'POST':
+            image = request.FILES.get('image')  # Use request.FILES for file uploads
             user = request.user
-            image = request.FILES.get('image')
             user.user.image = image
             user.user.save()
 
-        # Redirect to the user's profile view after uploading photo
-        return redirect('user_profile', username=user.username)
+            return redirect('profile', username=request.user.username)
     except Exception as e:
         # Handle exceptions if needed
         print(f"An error occurred: {e}")
         return redirect('landing')  # Provide a default URL in case of an error
-    
-    
-def show_images(request):
-    profiles = UserProfile.objects.all()    
-    return render(request, 'profile.html', {'user_profiles': profiles})
-    

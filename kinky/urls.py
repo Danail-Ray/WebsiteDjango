@@ -13,7 +13,6 @@ from .views import upload_photo
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns = [
     path('', LoginView.as_view(template_name='login.html'), name='login'),
     path('signup', signup, name='signup'),
@@ -23,7 +22,8 @@ urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
     path('Users', all_users, name='Users'),
     path('changed-bio', update_bio_view, name='bio_update'),
-    path('upload_image/',upload_photo, name='upload_image'),
+    path('profile/<str:username>/upload_image', upload_photo, name='upload_image'),
+    path('preview/<int:pk>/', upload_photo, name='image_preview'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

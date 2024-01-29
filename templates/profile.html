@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {%load static%}
+    {% load static %}
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -41,7 +41,6 @@
             width: 100%;
             background: url("../static/images/waves.jpg") no-repeat 50% 20% / cover;
             min-height: calc(100px + 15vw);
-            overflow: hidden;
         }
 
         .header__wrapper .cols__container .left__col {
@@ -237,15 +236,18 @@
 
             html, body {
                 height: 100%;
-                overflow: hidden;
+                overflow: auto;
             }
+
             #top-left-button {
                 padding: 10px 20px;
                 font-size: 14px;
             }
-            
+
         }
+
         #top-left-button {
+            position: relative;
             background-color: #4CAF50; /* Green */
             border: none;
             color: white;
@@ -253,18 +255,38 @@
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 16px;
             margin: 4px 2px;
             cursor: pointer;
             border-radius: 4px;
         }
-        #header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+
+        #upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
         }
 
-        
+        #upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+        #upload-btn-wrapper .btn {
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #upload-btn-wrapper .btn:hover {
+            border-color: black;
+        }
     </style>
 </head>
 <body>
@@ -272,7 +294,8 @@
     <div id="container2">
         <div class="header__wrapper">
             <header>
-                <img id="top-left-button" src="your_image_url" alt="Clickable image" onclick="window.location.href='{% url 'landing' %}'">            
+                <img id="top-left-button" src="" alt="Clickable image"
+                     onclick="window.location.href='{% url 'landing' %}'">
             </header>
             <div class="cols__container">
                 <div class="left__col">
@@ -280,21 +303,21 @@
                         <img src="../static/images/noProfile.jpg" alt="profilePicture"/>
                         <span></span>
                     </div>
-                    <h2>{{viewed_user.username}}</h2>
+                    <h2>{{ viewed_user.username }}</h2>
                     <p>UX/UI Designer</p>
                     <p>anna@example.com</p>
 
                     <ul class="about">
-                        <li><span>{{viewed_user.user.followers_count}}</span>Followers</li>
+                        <li><span>{{ viewed_user.user.followers_count }}</span>Followers</li>
 
-                        <li><span>{{viewed_user.user.following_count}}</span>Following</li>
+                        <li><span>{{ viewed_user.user.following_count }}</span>Following</li>
 
-                        <li><span>{{viewed_user.user.likes_count}}</span>Likes</li>
+                        <li><span>{{ viewed_user.user.likes_count }}</span>Likes</li>
                     </ul>
 
                     <div class="content">
-                        <div class="content">
-                            <p>{{viewed_user.user.bio}}</p>
+                        <div class="content" id="show_bio">
+                            <p>{{ viewed_user.user.bio }}</p>
                         </div>
 
                         {% if viewed_user == request.user %}
@@ -305,7 +328,7 @@
                                         <label for="textInput">Enter text:</label>
                                         {% csrf_token %}
                                         <textarea id="bioValue" rows="4"
-                                                  cols="50">{{request.user.user.bio}}</textarea>
+                                                  cols="50">{{ request.user.user.bio }}</textarea>
                                         <br>
                                         <button onclick="src.saveText()">Save</button>
                                         <button onclick="src.discardText()">Discard</button>
@@ -338,7 +361,7 @@
                                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                                 }
                             </style>
-                            {%endif%}
+                        {% endif %}
                         <ul>
                             <li><i class="fab fa-twitter"></i></li>
                             <i class="fab fa-pinterest"></i>
@@ -350,7 +373,7 @@
                 <div class="right__col">
                     <nav>
                         <ul>
-                            <li><a href="/profile/{{request.user.username}}">photos</a></li>
+                            <li><a href="/profile/{{ request.user.username }}">photos</a></li>
                             <li><a href="">galleries</a></li>
                             <li><a href="">groups</a></li>
                         </ul>
@@ -360,9 +383,17 @@
                     </nav>
                     <!-- Card layout, can add 6 no problem! Make paywall after 6 ../media/images/upload.jpg -->
                     <div class="photos">
-                        {% for image in media.images %}
-                            <img src="{{ image.image.url }}" alt="photo">
-                        {% endfor %} 
+                        {% if viewed_user == request.user %}
+                            <form method="post" enctype="multipart/form-data" action="{% url 'upload_image' username=request.user.username %}">
+                                {% csrf_token %}
+                                <input type="file" id="image" accept="image/*" name="image" src="../media/images/upload.png">
+                                <!-- accept="image/*" restricts to image files -->
+                                <button type="submit">Upload Image</button>
+                            </form>
+                        {% endif %}
+                        {% for photo in viewed_user.user.photos.all %}
+                            <img src="{{ photo.image.url }}" alt="photo"/>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

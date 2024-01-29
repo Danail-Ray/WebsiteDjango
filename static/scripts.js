@@ -1,9 +1,8 @@
-
-const src= {
+const src = {
     saveText, discardText, closePopup, openPopup
 };
-    function openPopup()
-{
+
+function openPopup() {
     document.getElementById('overlay').style.display = 'block';
 }
 
@@ -34,6 +33,7 @@ function saveText() {
 
     closePopup();
 }
+
 
 function discardText() {
     // Clear the text in the textarea
