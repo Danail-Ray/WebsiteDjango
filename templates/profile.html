@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <script src="{% static 'scripts.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <title>{{ viewed_user.username }}'s Profile</title>
     <!-- Font Awesome -->
     <link
@@ -361,12 +362,25 @@
                                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                                 }
                             </style>
+                            <div id="upload">
+                                {% if viewed_user == request.user %}
+                                    <form method="post" enctype="multipart/form-data"
+                                          action="{% url 'upload_image' username=request.user.username %}">
+                                        {% csrf_token %}
+                                        <input type="file" id="image" accept="image/*" name="image"
+                                               src="../media/images/upload.png">
+                                        <!-- accept="image/*" restricts to image files -->
+                                        <button type="submit">Upload Image</button>
+                                    </form>
+                                {% endif %}
+                            </div>
                         {% endif %}
                         <ul>
                             <li><i class="fab fa-twitter"></i></li>
                             <i class="fab fa-pinterest"></i>
                             <i class="fab fa-facebook"></i>
                             <i class="fab fa-dribbble"></i>
+
                         </ul>
                     </div>
                 </div>
@@ -383,16 +397,8 @@
                     </nav>
                     <!-- Card layout, can add 6 no problem! Make paywall after 6 ../media/images/upload.jpg -->
                     <div class="photos">
-                        {% if viewed_user == request.user %}
-                            <form method="post" enctype="multipart/form-data" action="{% url 'upload_image' username=request.user.username %}">
-                                {% csrf_token %}
-                                <input type="file" id="image" accept="image/*" name="image" src="../media/images/upload.png">
-                                <!-- accept="image/*" restricts to image files -->
-                                <button type="submit">Upload Image</button>
-                            </form>
-                        {% endif %}
-                        {% for photo in viewed_user.user.photos.all %}
-                            <img src="{{ photo.image.url }}" alt="photo"/>
+                        {% for image_from_user in images_from_user %}
+                            <img src="{{ image_from_user.image.url }}" alt="User Image">
                         {% endfor %}
                     </div>
                 </div>

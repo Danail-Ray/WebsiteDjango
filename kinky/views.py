@@ -1,13 +1,17 @@
+from django.contrib import messages
 from django.views import View
 from .forms import SignupForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
+from django.conf import settings
+import os
 from .models import UserProfile
+from .models import ImagesFromUser
 
 
 def login_view(request):
@@ -31,6 +35,15 @@ def signup(request):
 
             # Save the user to the database
             user = form.save()
+
+            # create folder for image upload
+            folder_path = os.path.join(settings.MEDIA_ROOT, str(user), 'images')
+            if not os.path.exists(folder_path):
+                # If not, create the folder
+                os.makedirs(folder_path)
+                print(f"Folder '{folder_path}' created successfully.")
+            else:
+                print(f"Folder '{folder_path}' already exists.")
 
             # Log the user in
             login(request, user)
@@ -61,18 +74,21 @@ class UserProfileView(View):
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
-        return render(request, self.template_name, {'viewed_user': user})
+
+        images_folder_path = os.path.join(settings.MEDIA_ROOT, str(user), 'images')
+        image_files = [f for f in os.listdir(images_folder_path) if os.path.isfile(os.path.join(images_folder_path, f))]
+        full_paths = [os.path.join(images_folder_path, f).replace("\\", "/") for f in image_files]
+        images_from_user = ImagesFromUser.objects.filter(user=user)
+        print(images_from_user)
+
+        return render(request, self.template_name, {'viewed_user': user,
+                                                    'image_files': image_files, 'full_paths': full_paths,
+                                                    'images_from_user': images_from_user})
 
 
 def all_users(request):
     users = User.objects.all()
     return render(request, 'allUsers.html', {'users': users})
-
-
-def user_profile_view(request, username):
-    viewed_user = get_object_or_404(User, username=username)
-    user_profile = UserProfileView.objects.get(user=viewed_user)
-    return render(request, 'profile.html', {'viewed_user': viewed_user, 'user_profile': user_profile})
 
 
 def update_bio_view(request):
@@ -99,11 +115,24 @@ def upload_photo(request, username):
         if request.method == 'POST':
             image = request.FILES.get('image')  # Use request.FILES for file uploads
             user = request.user
-            user.user.image = image
+            image.name = str(user) + '.jpg'
+            # user.user.image = image
+            # user.user.images_path = str(settings.MEDIA_ROOT).replace("\\", "/") + '/' + username + '/images/'
+
+            images_user = ImagesFromUser(user=request.user, image=image)
+            images_user.save()
+
+            user.user.image_counter += 1
             user.user.save()
 
+            messages.success(request, 'Photo uploaded successfully!')
             return redirect('profile', username=request.user.username)
     except Exception as e:
         # Handle exceptions if needed
         print(f"An error occurred: {e}")
         return redirect('landing')  # Provide a default URL in case of an error
+
+
+def get_data(request):
+    data = UserProfile.objects.values()
+    return JsonResponse(list(data), safe=False)
