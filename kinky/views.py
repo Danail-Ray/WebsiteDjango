@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 import os
-from .models import UserProfile
+from .models import UserProfile, Follow
 from .models import ImagesFromUser
 
 
@@ -79,11 +79,16 @@ class UserProfileView(View):
         image_files = [f for f in os.listdir(images_folder_path) if os.path.isfile(os.path.join(images_folder_path, f))]
         full_paths = [os.path.join(images_folder_path, f).replace("\\", "/") for f in image_files]
         images_from_user = ImagesFromUser.objects.filter(user=user)
+
+        following = Follow.objects.filter(follower=request.user, following=user)
+        is_following = following.exists()
+
         print(images_from_user)
+        print(following)
 
         return render(request, self.template_name, {'viewed_user': user,
                                                     'image_files': image_files, 'full_paths': full_paths,
-                                                    'images_from_user': images_from_user})
+                                                    'images_from_user': images_from_user, 'is_following': is_following})
 
 
 def all_users(request):
@@ -116,8 +121,6 @@ def upload_photo(request, username):
             image = request.FILES.get('image')  # Use request.FILES for file uploads
             user = request.user
             image.name = str(user) + '.jpg'
-            # user.user.image = image
-            # user.user.images_path = str(settings.MEDIA_ROOT).replace("\\", "/") + '/' + username + '/images/'
 
             images_user = ImagesFromUser(user=request.user, image=image)
             images_user.save()
@@ -136,3 +139,33 @@ def upload_photo(request, username):
 def get_data(request):
     data = UserProfile.objects.values()
     return JsonResponse(list(data), safe=False)
+
+
+def follow_user(request, username):
+    try:
+        if request.method == 'POST':
+            user = request.user
+            user_profile = get_object_or_404(User, username=username)
+            following = Follow.objects.filter(follower=user, following=user_profile)
+            print(following)
+
+            if not following.exists():
+                follow = Follow(follower=user, following=user_profile)
+                user.user.following_count += 1
+                user_profile.user.followers_count += 1
+                follow.save()
+            else:
+                following.delete()
+                user.user.following_count -= 1
+                user_profile.user.followers_count -= 1
+
+            user.user.save()
+            user_profile.user.save()
+            messages.success(request, 'Photo uploaded successfully!')
+            return redirect('profile', username=username)
+    except Exception as e:
+        # Handle exceptions if needed
+        print(f"An error occurred: {e}")
+        return redirect('landing')  # Provide a default URL in case of an error
+
+

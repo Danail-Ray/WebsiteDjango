@@ -9,6 +9,8 @@ from django.views.generic.base import RedirectView
 from .views import all_users
 from .views import update_bio_view
 from .views import upload_photo
+from .views import follow_user
+
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -23,6 +25,7 @@ urlpatterns = [
     path('Users', all_users, name='Users'),
     path('changed-bio', update_bio_view, name='bio_update'),
     path('profile/<str:username>/upload_image', upload_photo, name='upload_image'),
+    path('profile/<str:username>/follow_user', follow_user, name='follow_user'),
     path('preview/<int:pk>/', upload_photo, name='image_preview'),
 ]
 

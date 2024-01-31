@@ -10,8 +10,6 @@ def user_image_upload_path(instance, filename):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
-    username = models.CharField(max_length=30, default='')
-    followers = models.ManyToManyField(User, related_name='following', blank=True)
     followers_count = models.IntegerField(default=0)
     following_count = models.IntegerField(default=0)
     likes_count = models.IntegerField(default=0)
@@ -31,3 +29,10 @@ class ImagesFromUser(models.Model):
     def __str__(self):
         return self.user.username
 
+
+class Follow(models.Model):
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower')
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+
+    def __str__(self):
+        return self.follower.username + ' follows ' + self.following.username
