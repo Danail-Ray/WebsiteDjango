@@ -288,6 +288,16 @@
         #upload-btn-wrapper .btn:hover {
             border-color: black;
         }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -301,7 +311,19 @@
             <div class="cols__container">
                 <div class="left__col">
                     <div class="img__container">
-                        <img src="../static/images/noProfile.jpg" alt="profilePicture"/>
+                        {% if viewed_user == request.user %}
+                            <form id="profile_picture" method="post" enctype="multipart/form-data"
+                                  action="{% url 'upload_profile' %}">
+                                {% csrf_token %}
+                                <input id="profile_image" name="profile_image" type="file" class="file-input" accept="image/*"
+                                       onchange="submitForm()">
+                            </form>
+                        {% endif %}
+                        {% if viewed_user.user.profile_image %}
+                            <img src="{{ viewed_user.user.profile_image.url }}" alt="profilePicture"/>
+                        {% else %}
+                            <img src="../static/images/noProfile.jpg" alt="profilePicture"/>
+                        {% endif %}
                         <span></span>
                     </div>
                     <h2>{{ viewed_user.username }}</h2>
@@ -367,8 +389,7 @@
                                     <form method="post" enctype="multipart/form-data"
                                           action="{% url 'upload_image' username=request.user.username %}">
                                         {% csrf_token %}
-                                        <input type="file" id="image" accept="image/*" name="image"
-                                               src="../media/images/upload.png">
+                                        <input type="file" id="image" accept="image/*" name="image">
                                         <!-- accept="image/*" restricts to image files -->
                                         <button type="submit">Upload Image</button>
                                     </form>
@@ -387,14 +408,13 @@
                 <div class="right__col">
                     <nav>
                         <ul>
-                            <li><a href="/profile/{{ request.user.username }}">photos</a></li>
+                            <li><a href="/profile/{{ viewed_user.username }}">photos</a></li>
                             <li><a href="">galleries</a></li>
                             <li><a href="">groups</a></li>
                         </ul>
                         {% if viewed_user != request.user %}
                             <form method="post" action="{% url 'follow_user' username=viewed_user.username %}">
                                 {% csrf_token %}
-                                <!-- accept="image/*" restricts to image files -->
                                 {% if not is_following %}
                                     <button type="submit">Follow</button>
                                 {% else %}

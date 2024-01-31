@@ -1,5 +1,5 @@
 const src = {
-    saveText, discardText, closePopup, openPopup
+    saveText, discardText, closePopup, openPopup, submitForm, displayImage
 };
 
 function openPopup() {
@@ -34,11 +34,31 @@ function saveText() {
     closePopup();
 }
 
-
 function discardText() {
-    // Clear the text in the textarea
-    document.getElementById('bioValue').value = '';
-
     // Close the popup
     closePopup();
+}
+
+function submitForm() {
+    setTimeout(function () {
+        document.getElementById('profile_picture').submit();
+    }, 1000); // 1000 milliseconds = 1 second
+}
+
+function displayImage(input) {
+    const container = input.parentElement;
+    const file = input.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            container.style.backgroundImage = `url('${e.target.result}')`;
+            container.style.backgroundSize = 'cover';
+            container.style.backgroundPosition = 'center';
+            container.innerHTML = ''; // Clear the text content
+            submitForm(); // Automatically submit the form after displaying the image
+        };
+
+        reader.readAsDataURL(file);
+    }
 }

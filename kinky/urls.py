@@ -10,7 +10,7 @@ from .views import all_users
 from .views import update_bio_view
 from .views import upload_photo
 from .views import follow_user
-
+from .views import upload_profile
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -26,6 +26,7 @@ urlpatterns = [
     path('changed-bio', update_bio_view, name='bio_update'),
     path('profile/<str:username>/upload_image', upload_photo, name='upload_image'),
     path('profile/<str:username>/follow_user', follow_user, name='follow_user'),
+    path('upload_profile', upload_profile, name='upload_profile'),
     path('preview/<int:pk>/', upload_photo, name='image_preview'),
 ]
 

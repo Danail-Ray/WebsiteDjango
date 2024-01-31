@@ -83,9 +83,6 @@ class UserProfileView(View):
         following = Follow.objects.filter(follower=request.user, following=user)
         is_following = following.exists()
 
-        print(images_from_user)
-        print(following)
-
         return render(request, self.template_name, {'viewed_user': user,
                                                     'image_files': image_files, 'full_paths': full_paths,
                                                     'images_from_user': images_from_user, 'is_following': is_following})
@@ -121,6 +118,7 @@ def upload_photo(request, username):
             image = request.FILES.get('image')  # Use request.FILES for file uploads
             user = request.user
             image.name = str(user) + '.jpg'
+            user.user.profile_image = image
 
             images_user = ImagesFromUser(user=request.user, image=image)
             images_user.save()
@@ -169,3 +167,18 @@ def follow_user(request, username):
         return redirect('landing')  # Provide a default URL in case of an error
 
 
+def upload_profile(request):
+    try:
+        if request.method == 'POST':
+            image = request.FILES.get('profile_image')  # Use request.FILES for file uploads
+            print(image)
+            user = request.user
+            user.user.profile_image.delete()
+            user.user.profile_image = image
+            user.user.save()
+            messages.success(request, 'Photo uploaded successfully!')
+            return redirect('profile', username=request.user.username)
+    except Exception as e:
+        # Handle exceptions if needed
+        print(f"An error occurred: {e}")
+        return redirect('landing')  # Provide a default URL in case of an error
