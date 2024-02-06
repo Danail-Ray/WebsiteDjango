@@ -199,3 +199,13 @@ def delete_photo(request, photo_id, username):
         pass  # Image file doesn't exist locally, no need to delete
 
     return redirect('profile', username=username)
+
+
+@login_required
+def feed(request):
+    user = request.user
+    all_images = ImagesFromUser.objects.all()
+    first = all_images.first()
+    id = first.id
+    print(id)
+    return render(request, 'feed.html', {'user': user, 'all_images': all_images})

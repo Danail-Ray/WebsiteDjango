@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram-like Feed</title>
+    <link rel="stylesheet" href={% static 'styles/feedStyles.css' %}> <!-- Link to your CSS file -->
+</head>
+<body>
+<div class="container">
+    <h1>Instagram-like Feed</h1>
+    <div class="feed">
+        <!-- Example post -->
+        <div class="post">
+            {% for image in all_images %}
+                <div class="post-header">
+                    <img class="avatar" src="{{ image.user.user.profile_image.url }}" alt="{{ image.user.username }}">
+                    <span class="username">Username</span>
+                </div>
+
+                <img src="{{ image.image.url }}" alt="User Image"
+                     id="{{ image.id }}">
+                <div class="post-actions">
+                    <!-- Add like, comment, and other buttons/icons here -->
+                </div>
+                <div class="post-caption">
+                    <span class="username">Username:</span>
+                    <span class="caption-text">Caption text goes here...</span>
+                </div>
+            {% endfor %}
+
+        </div>
+        <!-- Add more posts as needed -->
+    </div>
+</div>
+</body>
+</html>

@@ -26,6 +26,8 @@ class UserProfile(models.Model):
 class ImagesFromUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=user_image_upload_path, default='', blank=True, null=True, )
+    likes = models.IntegerField(default=0)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
