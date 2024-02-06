@@ -16,9 +16,8 @@
             {% for image in all_images %}
                 <div class="post-header">
                     <img class="avatar" src="{{ image.user.user.profile_image.url }}" alt="{{ image.user.username }}">
-                    <span class="username">Username</span>
+                    <span class="username">{{ image.user.username }}</span>
                 </div>
-
                 <img src="{{ image.image.url }}" alt="User Image"
                      id="{{ image.id }}">
                 <div class="post-actions">
@@ -29,7 +28,6 @@
                     <span class="caption-text">Caption text goes here...</span>
                 </div>
             {% endfor %}
-
         </div>
         <!-- Add more posts as needed -->
     </div>
