@@ -12,8 +12,8 @@
     <h1>Instagram-like Feed</h1>
     <div class="feed">
         <!-- Example post -->
-        <div class="post">
-            {% for image in all_images %}
+        {% for image in all_images %}
+            <div class="post">
                 <div class="post-header">
                     <img class="avatar" src="{{ image.user.user.profile_image.url }}" alt="{{ image.user.username }}">
                     <span class="username">{{ image.user.username }}</span>
@@ -27,8 +27,8 @@
                     <span class="username">Username:</span>
                     <span class="caption-text">Caption text goes here...</span>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
         <!-- Add more posts as needed -->
     </div>
 </div>
