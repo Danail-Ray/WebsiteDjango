@@ -181,14 +181,16 @@
 
         .header__wrapper .cols__container .right__col .photos {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 2fr));
             gap: 20px;
+            /* Set a fixed height for the container */
+            height: 200px; /* Adjust as needed */
         }
 
         .header__wrapper .cols__container .right__col .photos img {
             max-width: 100%;
-            display: block;
-            height: 100%;
+            width: 100%; /* Ensure images take full width of their parent container */
+            height: 200px; /* Ensure images take full height of their parent container */
             object-fit: cover;
         }
 
@@ -216,8 +218,8 @@
 
             .header__wrapper .cols__container .right__col .photos {
                 height: 365px;
-                overflow: auto;
-                padding: 0 0 30px;
+                overflow: hidden;
+                padding: 0 0 100px;
             }
         }
 
@@ -265,28 +267,9 @@
             position: relative;
             overflow: hidden;
             display: inline-block;
-        }
-
-        #upload-btn-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-        }
-
-        #upload-btn-wrapper .btn {
-            border: 2px solid gray;
-            color: gray;
-            background-color: white;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        #upload-btn-wrapper .btn:hover {
-            border-color: black;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            scale: 100%; /* Ensure button takes full width of its grid space */
         }
 
         .file-input {
@@ -297,6 +280,31 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+        }
+
+        button:disabled {
+            pointer-events: none; /* Disable hover effect */
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0);
+        }
+
+        #popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
@@ -315,7 +323,8 @@
                             <form id="profile_picture" method="post" enctype="multipart/form-data"
                                   action="{% url 'upload_profile' %}">
                                 {% csrf_token %}
-                                <input id="profile_image" name="profile_image" type="file" class="file-input" accept="image/*"
+                                <input id="profile_image" name="profile_image" type="file" class="file-input"
+                                       accept="image/*"
                                        onchange="submitForm()">
                             </form>
                         {% endif %}
@@ -342,10 +351,9 @@
                         <div class="content" id="show_bio">
                             <p>{{ viewed_user.user.bio }}</p>
                         </div>
-
                         {% if viewed_user == request.user %}
                             <div class="content">
-                                <button onclick="src.openPopup()">Add Bio</button>
+                                <button onclick="openPopup()">Add Bio</button>
                                 <div id="overlay">
                                     <div id="popup">
                                         <label for="textInput">Enter text:</label>
@@ -353,47 +361,10 @@
                                         <textarea id="bioValue" rows="4"
                                                   cols="50">{{ request.user.user.bio }}</textarea>
                                         <br>
-                                        <button onclick="src.saveText()">Save</button>
-                                        <button onclick="src.discardText()">Discard</button>
+                                        <button onclick="saveText()">Save</button>
+                                        <button onclick="closePopup()">Discard</button>
                                     </div>
                                 </div>
-                            </div>
-                            <style>
-                                body {
-                                    font-family: Arial, sans-serif;
-                                }
-
-                                #overlay {
-                                    display: none;
-                                    position: fixed;
-                                    top: 0;
-                                    left: 0;
-                                    width: 100%;
-                                    height: 100%;
-                                    background-color: rgba(0, 0, 0, 0.7);
-                                }
-
-                                #popup {
-                                    position: fixed;
-                                    top: 50%;
-                                    left: 50%;
-                                    transform: translate(-50%, -50%);
-                                    background-color: white;
-                                    padding: 20px;
-                                    border-radius: 5px;
-                                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-                                }
-                            </style>
-                            <div id="upload">
-                                {% if viewed_user == request.user %}
-                                    <form method="post" enctype="multipart/form-data"
-                                          action="{% url 'upload_image' username=request.user.username %}">
-                                        {% csrf_token %}
-                                        <input type="file" id="image" accept="image/*" name="image">
-                                        <!-- accept="image/*" restricts to image files -->
-                                        <button type="submit">Upload Image</button>
-                                    </form>
-                                {% endif %}
                             </div>
                         {% endif %}
                         <ul>
@@ -401,7 +372,6 @@
                             <i class="fab fa-pinterest"></i>
                             <i class="fab fa-facebook"></i>
                             <i class="fab fa-dribbble"></i>
-
                         </ul>
                     </div>
                 </div>
@@ -426,8 +396,30 @@
                     <!-- Card layout, can add 6 no problem! Make paywall after 6 ../media/images/upload.jpg -->
                     <div class="photos">
                         {% for image_from_user in images_from_user %}
-                            <img src="{{ image_from_user.image.url }}" alt="User Image">
+                            {% if viewed_user == request.user %}
+                                {% csrf_token %}
+                                <img src="{{ image_from_user.image.url }}" alt="User Image"
+                                     id="{{ image_from_user.id }}"
+                                     onclick="deletePhoto('{{ image_from_user.id }}', '{{ request.user.username }}')">
+                            {% else %}
+                                <img src="{{ image_from_user.image.url }}" alt="User Image"
+                                     id="{{ viewed_user.user.image.name }}">
+                            {% endif %}
                         {% endfor %}
+                        {% if request.user == viewed_user %}
+                            <div id="upload-btn-wrapper">
+                                <div>
+                                    <img src="{% static 'images/image_upload.jpg' %}" id="upload_image" alt="">
+                                </div>
+                                <form id="image_form" method="post" enctype="multipart/form-data"
+                                      action="{% url 'upload_image' username=request.user.username %}">
+                                    {% csrf_token %}
+                                    <input id="imageContainer" name="imageContainer" type="file" class="file-input"
+                                           accept="image/*"
+                                           onchange="submitPhoto()">
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

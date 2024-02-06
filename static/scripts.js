@@ -1,13 +1,15 @@
 const src = {
-    saveText, discardText, closePopup, openPopup, submitForm, displayImage
+    saveText, discardText, closePopup, openPopup, submitForm, deletePhoto, submitPhoto
 };
 
 function openPopup() {
     document.getElementById('overlay').style.display = 'block';
+    disableFields();
 }
 
 function closePopup() {
     document.getElementById('overlay').style.display = 'none';
+    activateFields();
 }
 
 function saveText() {
@@ -42,23 +44,37 @@ function discardText() {
 function submitForm() {
     setTimeout(function () {
         document.getElementById('profile_picture').submit();
-    }, 1000); // 1000 milliseconds = 1 second
+    }, 0); // 1000 milliseconds = 1 second
 }
 
-function displayImage(input) {
-    const container = input.parentElement;
-    const file = input.files[0];
+function submitPhoto() {
+    setTimeout(function () {
+        document.getElementById('image_form').submit();
+    }, 0); // 1000 milliseconds = 1 second
+}
 
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            container.style.backgroundImage = `url('${e.target.result}')`;
-            container.style.backgroundSize = 'cover';
-            container.style.backgroundPosition = 'center';
-            container.innerHTML = ''; // Clear the text content
-            submitForm(); // Automatically submit the form after displaying the image
-        };
+function deletePhoto(photoId, username) {
+    window.location.href = "/profile/" + username + "/delete_photo/" + photoId;
+    //window.location.href = "{% url 'delete_photo' username=request.user.username photo_id=photoId %}";
+}
 
-        reader.readAsDataURL(file);
-    }
+//imageContainer
+function disableFields() {
+    let fileInput = document.getElementById('upload-btn-wrapper');
+    let imageContainer = document.getElementById('imageContainer');
+    imageContainer.disabled = true;
+    imageContainer.style.pointerEvents = "none";
+    fileInput.disabled = true;
+    fileInput.style.pointerEvents = "none";
+    imageContainer.classList.add('overlay');
+
+}
+
+function activateFields() {
+    let fileInput = document.getElementById('upload-btn-wrapper');
+    fileInput.disabled = false;
+    let imageContainer = document.getElementById('imageContainer');
+    imageContainer.disabled = false;
+    fileInput.classList.remove('overlay');
+    imageContainer.style.pointerEvents = "auto";
 }

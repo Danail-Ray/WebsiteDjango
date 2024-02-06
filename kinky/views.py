@@ -115,10 +115,9 @@ def update_bio_view(request):
 def upload_photo(request, username):
     try:
         if request.method == 'POST':
-            image = request.FILES.get('image')  # Use request.FILES for file uploads
+            image = request.FILES.get('imageContainer')  # Use request.FILES for file uploads
             user = request.user
             image.name = str(user) + '.jpg'
-            user.user.profile_image = image
 
             images_user = ImagesFromUser(user=request.user, image=image)
             images_user.save()
@@ -182,3 +181,21 @@ def upload_profile(request):
         # Handle exceptions if needed
         print(f"An error occurred: {e}")
         return redirect('landing')  # Provide a default URL in case of an error
+
+
+@login_required
+def delete_photo(request, photo_id, username):
+    user = request.user
+    image = ImagesFromUser.objects.get(id=photo_id)
+    image.delete()
+    user.user.image_counter -= 1
+    user.user.save()
+    print("-------------------")
+    print(image.image.name)
+
+    try:
+        os.remove(os.path.join(settings.MEDIA_ROOT, image.image.name))
+    except FileNotFoundError:
+        pass  # Image file doesn't exist locally, no need to delete
+
+    return redirect('profile', username=username)

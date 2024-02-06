@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import signup
+from .views import signup, delete_photo
 from .views import landing
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.views import LogoutView
@@ -27,7 +27,7 @@ urlpatterns = [
     path('profile/<str:username>/upload_image', upload_photo, name='upload_image'),
     path('profile/<str:username>/follow_user', follow_user, name='follow_user'),
     path('upload_profile', upload_profile, name='upload_profile'),
-    path('preview/<int:pk>/', upload_photo, name='image_preview'),
+    path('profile/<str:username>/delete_photo/<int:photo_id>', delete_photo, name='delete_photo'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
