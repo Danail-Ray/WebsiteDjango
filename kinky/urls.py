@@ -12,6 +12,7 @@ from .views import upload_photo
 from .views import follow_user
 from .views import upload_profile
 from .views import feed
+from .views import update_feed
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -30,6 +31,7 @@ urlpatterns = [
     path('upload_profile', upload_profile, name='upload_profile'),
     path('profile/<str:username>/delete_photo/<int:photo_id>', delete_photo, name='delete_photo'),
     path('feed', feed, name='feed'),
+    path('update_feed', update_feed, name='update_feed'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

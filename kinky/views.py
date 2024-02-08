@@ -203,9 +203,25 @@ def delete_photo(request, photo_id, username):
 
 @login_required
 def feed(request):
+    print("loadedWithAjax")
     user = request.user
-    all_images = ImagesFromUser.objects.all()
-    first = all_images.first()
-    id = first.id
-    print(id)
-    return render(request, 'feed.html', {'user': user, 'all_images': all_images})
+    page = int(request.GET.get('page', 1))
+    limit = 10  # Number of posts to load per request
+    offset = (page - 1) * limit
+    posts = ImagesFromUser.objects.all()[offset:offset + limit]
+    return render(request, 'feed.html', {'user': user, 'posts': posts})
+
+
+def update_feed(request):
+    user = request.user
+    page = int(request.GET.get('page'))
+    print(page)
+    limit = 10  # Number of posts to load per request
+    offset = (page - 1) * limit
+    posts = ImagesFromUser.objects.all()[offset:offset + limit]
+    serialized_data = [{'page': page, 'image_url': item.image.url, 'username': item.user.username, 'image_id': item.id,
+                        'profile_picture_url': item.user.user.profile_image.url, 'likes': item.likes, 'date': item.date}
+                       for item in posts]
+    if len(posts) == 0:
+        return JsonResponse({'data': -1})
+    return JsonResponse({'data': serialized_data})

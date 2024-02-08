@@ -17,10 +17,9 @@ body {
 }
 
 .post {
-    border: 1px solid #ddd; /* Example border */
+    border: 2px solid #ddd; /* Example border */
     border-radius: 5px;
     overflow: hidden;
-    padding: 30px;
 }
 
 .post-header {

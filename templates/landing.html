@@ -34,7 +34,7 @@
             display: none;
             position: absolute;
             background-color: #f9f9f9;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 1;
             min-width: 160px;
             text-align: left;
@@ -96,31 +96,32 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="dropdown">
-            <a href="/profile/{{ request.user.username }}">{{ request.user.username }}'s Profile</a>
-        </div>
-        <h1>Cute Landing Page</h1>
-    </header>
-
-    <div class="container">
-        <p class="success-message">Congratulations! You've successfully signed up.</p>
-        <p>Welcome, {{ request.user.username }}!</p>
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
-        <!-- Add more content or features specific to your application here -->
+<header>
+    <div class="dropdown">
+        <a href="/profile/{{ request.user.username }}">{{ request.user.username }}'s Profile</a>
+        <a href="{% url 'feed' %}">Feed</a>
     </div>
+    <h1>Cute Landing Page</h1>
+</header>
 
-    <footer>
-        <p>&copy; 2024 Cute Landing Page. All rights reserved.</p>
-    </footer>
-    <script>
-        // JavaScript to reload the page on error
-        {% if error_message %}
-            window.location.reload();
-        {% endif %}
-    </script>
+<div class="container">
+    <p class="success-message">Congratulations! You've successfully signed up.</p>
+    <p>Welcome, {{ request.user.username }}!</p>
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+    <!-- Add more content or features specific to your application here -->
+</div>
+
+<footer>
+    <p>&copy; 2024 Cute Landing Page. All rights reserved.</p>
+</footer>
+<script>
+    // JavaScript to reload the page on error
+    {% if error_message %}
+        window.location.reload();
+    {% endif %}
+</script>
 </body>
 </html>

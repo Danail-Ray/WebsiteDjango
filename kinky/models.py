@@ -17,7 +17,8 @@ class UserProfile(models.Model):
     birth_date = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female')), default='')
     image_counter = models.IntegerField(default=0)
-    profile_image = models.ImageField(upload_to=user_image_upload_path,default='', blank=True, null=True, )
+    profile_image = models.ImageField(upload_to=user_image_upload_path, default='', blank=True, null=True, )
+    feed_page = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
