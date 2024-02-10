@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instagram-like Feed</title>
-    <link rel="stylesheet" href={% static 'styles/feedStyles.css' %}> <!-- Link to your CSS file -->
+    <link rel="stylesheet" href={% static 'styles/feedStyles.css' %}>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src={% static 'autoload.js' %}></script> <!-- Link to your JS file -->
+    <script src={% static 'autoload.js' %}></script>
     <script>
         $(document).ready(function () {
             let page = 1;
@@ -26,7 +26,6 @@
                             let username = item.username;
                             let imageId = item.image_id;
                             let proilePicture = item.profile_picture_url;
-                            // Example: Append the data to your HTML container
                             $('.feed').append('<div class="post"><div class="post-header"><img class="avatar" src="' + proilePicture + '" alt=""><span class="username"> ' + username + ' </span> </div> <img src="' + imageUrl + '" alt="User Image"id=""> <div class="post-actions"></div><div class="post-caption"> <span class="username">Username:</span> <span class="caption-text">Caption text goes here...</span></div></div>');
                         });
                     }
@@ -39,7 +38,7 @@
                     page++;
                 }
             });
-            loadPosts(); // Load initial posts
+            loadPosts();
             page++;
         });
     </script>
@@ -48,9 +47,6 @@
 <div class="container">
     <h1>Instagram-like Feed</h1>
     <div class="feed">
-        <!-- Example post -->
-
-        <!-- Add more posts as needed -->
     </div>
 </div>
 </body>
